@@ -3,7 +3,7 @@ import { saltRounds } from "../constant/bcrypt"
 import db from "../db"
 import jwt from "jsonwebtoken"
 import { jwtExpires, jwtData } from "../constant/jwt"
-import { insertNewUserByEmailPassword, getUserByEmail } from "../db/query"
+import { insertNewUserByEmailPassword, getUserByEmail, getAllUser, getUserDetailById } from "../db/query"
 
 type userAuth = {
   access_token: string
@@ -23,7 +23,27 @@ const isEmailDuplicated = async (email: string): Promise<boolean> => {
   }
 }
 
-export const loginUserByEmailPassword = async (email: string, password: string): Promise<userAuth> => {
+const getAllUserList = async (): Promise<any[]> => {
+  try {
+    const res = await db.query(getAllUser, null)
+    return res.rows
+  } catch (error) {
+    console.log(error)
+    return []
+  }
+}
+
+const getUserDetail = async (id: number): Promise<object> => {
+  try {
+    const res = await db.query(getUserDetailById, [id])
+    return res.rows[0]
+  } catch (error) {
+    console.log(error)
+    return {}
+  }
+}
+
+const loginUserByEmailPassword = async (email: string, password: string): Promise<userAuth> => {
   try {
     const res = await db.query(getUserByEmail, [email])
     if (res.rows[0]) {
@@ -46,7 +66,7 @@ export const loginUserByEmailPassword = async (email: string, password: string):
   }
 }
 
-export const createUserByEmailPassword = async (full_name: string, email: string, password: string): Promise<userAuth> => {
+const createUserByEmailPassword = async (full_name: string, email: string, password: string): Promise<userAuth> => {
   const checkUserEmail: boolean = await isEmailDuplicated(email)
   if (checkUserEmail) return { access_token: "", message: "Email already taken." }
 
@@ -62,4 +82,11 @@ export const createUserByEmailPassword = async (full_name: string, email: string
     console.log(error)
     return { access_token: "", message: error }
   }
+}
+
+export default {
+  getAllUserList,
+  loginUserByEmailPassword,
+  createUserByEmailPassword,
+  getUserDetail
 }

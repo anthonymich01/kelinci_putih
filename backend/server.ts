@@ -2,43 +2,49 @@ require("dotenv").config()
 import express from "express"
 import { graphqlHTTP } from "express-graphql"
 import { GraphQLInt, GraphQLList, GraphQLNonNull, GraphQLObjectType, GraphQLSchema, GraphQLString } from "graphql"
+import jwt from "jsonwebtoken"
 import cors from "cors"
 import morgan from "morgan"
-import { createUserByEmailPassword, loginUserByEmailPassword } from "./src/model/User"
+import UserModel from "./src/model/User"
 
 // Import Query Type
 import AuthType from "./src/graphql/type/auth"
-
-const UserType = new GraphQLObjectType({
-  name: "User",
-  description: "A Single User",
-  fields: () => ({
-    id: { type: GraphQLNonNull(GraphQLInt) },
-    full_name: { type: GraphQLNonNull(GraphQLString) },
-    email: { type: GraphQLNonNull(GraphQLString) },
-    created_at: { type: GraphQLNonNull(GraphQLString) },
-    deleted_at: { type: GraphQLNonNull(GraphQLString) }
-  })
-})
+import UserType from "./src/graphql/type/user"
 
 // The root provides a resolver function for each API endpoint
 const RootQueryType = new GraphQLObjectType({
   name: "Query",
   description: "Root Query",
   fields: () => ({
+    login: {
+      type: AuthType,
+      description: "Login With Email & Password",
+      args: {
+        email: { type: GraphQLNonNull(GraphQLString) },
+        password: { type: GraphQLNonNull(GraphQLString) }
+      },
+      resolve: async (parent, { email, password }) => {
+        return await UserModel.loginUserByEmailPassword(email, password)
+      }
+    },
     users: {
       type: new GraphQLList(UserType),
       description: "List of All Users",
-      resolve: () => ["aa"]
+      resolve: async () => {
+        return await UserModel.getAllUserList()
+      }
     },
     user: {
       type: UserType,
-      description: "A Single Book",
+      description: "A Single User",
       args: {
         id: { type: GraphQLInt }
       },
-      resolve: (parent, args, req) => {
-        return { id: 2, name: req.token }
+      resolve: async (parent, args, req) => {
+        if (!req.userId) {
+          throw new Error("Access Denied")
+        }
+        return await UserModel.getUserDetail(args.id)
       }
     }
   })
@@ -57,22 +63,7 @@ const RootMutationType = new GraphQLObjectType({
         password: { type: GraphQLNonNull(GraphQLString) }
       },
       resolve: async (parent, { full_name, email, password }) => {
-        const res = await createUserByEmailPassword(full_name, email, password)
-        console.log(res)
-        return res
-      }
-    },
-    login: {
-      type: AuthType,
-      description: "Login",
-      args: {
-        email: { type: GraphQLNonNull(GraphQLString) },
-        password: { type: GraphQLNonNull(GraphQLString) }
-      },
-      resolve: async (parent, { email, password }) => {
-        const res = await loginUserByEmailPassword(email, password)
-        console.log(res)
-        return res
+        return await UserModel.createUserByEmailPassword(full_name, email, password)
       }
     }
   })
@@ -90,7 +81,12 @@ const PORT = process.env.EXP_PORT || 3000
 const authTokenMiddleware = (req, res, next) => {
   const authHeader = req.headers["authorization"]
   const token = (authHeader && authHeader.split(" ")[1]) || ""
-  req.token = token
+  if (token) {
+    const decoded: any = jwt.verify(token, process.env.JWT_SECRET!)
+    if (decoded) {
+      req.userId = decoded.id
+    }
+  }
   next()
 }
 
