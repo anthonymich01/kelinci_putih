@@ -6,7 +6,8 @@
   "author": "Anthony Michael (https://github.com/anthonymich01)",
   "scripts": {
     "build": "tsc --project ./",
-    "dev": "nodemon server.ts"
+    "dev": "nodemon server.ts server-socket.ts",
+    "devSocket": "nodemon server-socket.ts"
   },
   "keywords": [],
   "license": "ISC",
@@ -21,6 +22,7 @@
     "jsonwebtoken": "^8.5.1",
     "morgan": "^1.10.0",
     "pg": "^8.5.1",
+    "socket.io": "^3.0.1",
     "tslib": "^2.0.1",
     "uuid": "^8.3.1"
   },

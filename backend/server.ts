@@ -44,7 +44,7 @@ const RootQueryType = new GraphQLObjectType({
         if (!req.userId) {
           throw new Error("Access Denied")
         }
-        return await UserModel.getUserDetail(args.id)
+        return await UserModel.getUserDetail(args.id || req.userId)
       }
     }
   })
@@ -78,6 +78,7 @@ const schema = new GraphQLSchema({
 const app = express()
 const PORT = process.env.EXP_PORT || 3000
 
+// Middleware
 const authTokenMiddleware = (req, res, next) => {
   const authHeader = req.headers["authorization"]
   const token = (authHeader && authHeader.split(" ")[1]) || ""
@@ -90,7 +91,6 @@ const authTokenMiddleware = (req, res, next) => {
   next()
 }
 
-// Middleware
 app.use(cors())
 app.use(morgan("tiny"))
 app.use(authTokenMiddleware)

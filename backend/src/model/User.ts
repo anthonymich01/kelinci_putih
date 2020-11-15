@@ -59,7 +59,7 @@ const loginUserByEmailPassword = async (email: string, password: string): Promis
         return { access_token, message: "Successfully Logged in!" }
       }
     }
-    return { access_token: "", message: "Email / Password anda salah." }
+    return { access_token: "", message: "Email / Password is not match." }
   } catch (error) {
     console.log(error)
     return { access_token: "", message: error }

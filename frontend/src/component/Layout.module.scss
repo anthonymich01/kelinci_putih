@@ -1,0 +1,44 @@
+.leftMenu {
+  float: left;
+  background-color: #112d4e;
+  color: #f9f7f7;
+  width: 300px;
+  height: 100vh;
+  padding: 20px;
+
+  .logo {
+    color: #dbe2ef;
+    text-align: center;
+    margin-bottom: 25px;
+  }
+
+  .you {
+    text-align: center;
+    margin-bottom: 25px;
+
+    #avatar {
+      width: 60px;
+      height: auto;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    h4 {
+      margin: 5px 0 2px;
+    }
+
+    p {
+      margin-bottom: 0;
+    }
+  }
+}
+
+.rightMenu {
+  float: right;
+  background-color: #dbe2ef;
+  color: #112d4e;
+  width: calc(100% - 300px);
+  height: 100vh;
+  padding: 20px 30px;
+  overflow-y: auto;
+}
