@@ -8,19 +8,39 @@ const io = require("socket.io")(server, {
 
 const PORT = process.env.SOC_PORT || 4000
 const NEW_CHAT_MESSAGE_EVENT = "newChatMessage"
+const NEW_USER_LOGIN_EVENT = "newUserLogin"
+const USER_LEAVE_EVENT = "UserLeave"
+const ONLINE_USERS_EVENT = "onlineUsers"
+
+const onlineUsers: onlineUser[] = []
+
+type onlineUser = {
+  id: string
+  token: string
+}
 
 io.on("connection", (socket) => {
-  // Join a conversation
-  console.log("aaaaaaaa")
+  // Listen for online users
+  socket.on(NEW_USER_LOGIN_EVENT, (data) => {
+    const newUser: onlineUser = {
+      id: data.userId,
+      token: socket.id
+    }
+    onlineUsers.push(newUser)
+    console.log(onlineUsers)
 
-  // Listen for new messages
-  socket.on(NEW_CHAT_MESSAGE_EVENT, (data) => {
-    console.log("c")
-  })
+    function sendOnlineUsers() {
+      socket.emit(ONLINE_USERS_EVENT, { online_users: onlineUsers })
+      setTimeout(sendOnlineUsers, 5000)
+    }
+    // Send online users every 5 sec
+    sendOnlineUsers()
 
-  // Leave the room if the user closes the socket
-  socket.on("disconnect", () => {
-    console.log("bbbbbbbbbb")
+    socket.on("disconnect", () => {
+      const idx = onlineUsers.findIndex((user) => user.token === socket.id)
+      onlineUsers.splice(idx, 1)
+      console.log(onlineUsers)
+    })
   })
 })
 

@@ -1,7 +1,6 @@
 import React from "react"
 import nextCookie from "next-cookies"
-import { gql } from "@apollo/client"
-import API from "../../src/api"
+import { getUserDetailById, getLoggedInUser } from "../../src/api"
 import { Label, Item, Icon, Button, Segment, Feed, Divider } from "semantic-ui-react"
 import Layout from "../../src/component/Layout"
 import style from "../../src/style/profile.module.scss"
@@ -12,21 +11,9 @@ export default class Profile extends React.Component {
     const { access_token = null } = nextCookie(ctx)
 
     try {
-      const res = await API(access_token).query({
-        query: gql`
-        query {
-          user(id:${id}) {
-            id
-            full_name
-            email
-            avatar_url
-            is_online
-          }
-        }
-      `
-      })
-
-      return { user: res.data.user, id }
+      const resProfile = await getUserDetailById(access_token, id)
+      const resLoggedIn = await getLoggedInUser(access_token)
+      return { user: resProfile.data.user, id, me: resLoggedIn.data.user }
     } catch (error) {
       console.log(error)
       return {}
@@ -34,11 +21,12 @@ export default class Profile extends React.Component {
   }
 
   render() {
-    const { user, id } = this.props
+    const { user, id, me } = this.props
     const firstName = user.full_name.split(" ")[0]
+    console.log(id, me.id)
 
     return (
-      <Layout>
+      <Layout user={me}>
         <h1>
           {firstName}'s Profile
           {user.is_online && <Label style={{ marginLeft: "10px" }} size="mini" circular color="green" empty />}
@@ -53,7 +41,7 @@ export default class Profile extends React.Component {
                 <Icon name="mail outline" id={style.profileEmailIcon} />
                 {user.email}
               </Item.Meta>
-              {id && (
+              {id && me.id != id && (
                 <Item.Description id={style.profileDesc}>
                   <Button icon="chat" content="Message" color="blue" />
                 </Item.Description>

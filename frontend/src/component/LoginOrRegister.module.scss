@@ -1,0 +1,23 @@
+.box {
+  width: 900px;
+  margin: 10px;
+
+  .topSegment {
+    background-color: #112d4e;
+
+    .logo {
+      color: #dbe2ef;
+      text-align: center;
+      margin: 20px;
+    }
+  }
+
+  .bottomSegment {
+    background-color: #f9f7f7;
+    color: #112d4e;
+
+    .title {
+      text-align: center;
+    }
+  }
+}
