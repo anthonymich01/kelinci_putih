@@ -1,8 +1,9 @@
 import React from "react"
-import { loginAttempt } from "../api"
+import { loginAttempt, registerAttempt } from "../api"
 import { login } from "../utils/auth"
 import { Button, Divider, Form, Grid, Icon, Segment, Input, Message } from "semantic-ui-react"
 import style from "./LoginOrRegister.module.scss"
+import { capitalizeFirstLetter } from "../utils"
 
 export default class Login extends React.Component {
   state = {
@@ -30,6 +31,30 @@ export default class Login extends React.Component {
         login(token)
       } else {
         this.setState({ loginError: "Email / Password is incorrect." })
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  handleRegisterSubmit = async () => {
+    const { regisName, regisEmail, regisPassword } = this.state
+    if (regisPassword.length < 6) {
+      this.setState({ regisError: "Minimum password length is 6 digit." })
+      return
+    }
+
+    const name = capitalizeFirstLetter(regisName.trim())
+    const email = regisEmail.trim()
+    const password = regisPassword.trim()
+
+    try {
+      const res = await registerAttempt(name, email, password)
+      if (res.data.register.access_token) {
+        const token = res.data.register.access_token
+        login(token)
+      } else {
+        this.setState({ regisError: "Email already taken." })
       }
     } catch (error) {
       console.log(error)
@@ -90,7 +115,7 @@ export default class Login extends React.Component {
                   <h2 className={style.title}>
                     Register <Icon name="file alternate" />
                   </h2>
-                  <Form>
+                  <Form onSubmit={this.handleRegisterSubmit}>
                     <Form.Group widths="equal">
                       <Form.Field required>
                         <label>Full Name</label>

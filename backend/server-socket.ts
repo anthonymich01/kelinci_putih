@@ -45,7 +45,7 @@ io.on("connection", (socket) => {
       setTimeout(() => {
         onlineUsers.splice(idx, 1)
         socket.broadcast.emit(ONLINE_USERS_EVENT, { online_users: onlineUsers })
-      }, 1000)
+      }, 100)
     })
   })
 })

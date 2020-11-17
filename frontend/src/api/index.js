@@ -30,6 +30,19 @@ export const loginAttempt = async (email, password) => {
   })
 }
 
+export const registerAttempt = async (full_name, email, password) => {
+  return await client(null).mutate({
+    mutation: gql`
+      mutation {
+        register(full_name: "${full_name}", email: "${email}", password: "${password}") {
+          access_token
+        }
+      }
+      
+    `
+  })
+}
+
 export const getLoggedInUser = async (token) => {
   return await client(token).query({
     query: gql`
@@ -88,6 +101,39 @@ export const addConversation = async (id, msg) => {
     mutation: gql`
       mutation {
         addConversation(to_id: ${id}, message: "${msg}")
+      }
+      
+    `
+  })
+}
+
+export const getPostsFromUser = async (token, id) => {
+  const myToken = token || access_token
+  return await client(myToken).query({
+    query: gql`
+      query {
+        posts (id: ${id}) {
+          from_id
+          to_id
+          post
+          created_at
+          created_by {
+            id
+            full_name
+            avatar_url
+          }
+        }
+      }
+      
+    `
+  })
+}
+
+export const addPost = async (id, post) => {
+  return await client(access_token).mutate({
+    mutation: gql`
+      mutation {
+        addPost(to_id: ${id}, post: "${post}")
       }
       
     `

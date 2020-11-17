@@ -22,4 +22,8 @@
 #profileFeed {
   max-width: 650px;
   background-color: #f9f7f7;
+
+  .feedItem {
+    margin-bottom: 15px;
+  }
 }

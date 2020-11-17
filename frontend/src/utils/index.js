@@ -6,3 +6,7 @@ export const sortedUsersList = (users, onlineUsers) => {
 
   return joinUsers.slice().sort((a, b) => b.isOnline - a.isOnline)
 }
+
+export const capitalizeFirstLetter = (string) => {
+  return string[0].toUpperCase() + string.slice(1)
+}

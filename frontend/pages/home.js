@@ -37,7 +37,6 @@ class Home extends React.Component {
 
       this.socket.on(ONLINE_USERS_EVENT, (data) => {
         this.setState({ onlineUsers: data.online_users })
-        console.log(data.online_users)
       })
     }
   }
