@@ -6,10 +6,14 @@ import jwt from "jsonwebtoken"
 import cors from "cors"
 import morgan from "morgan"
 import UserModel from "./src/model/User"
+import ConversationModel from "./src/model/Conversation"
+import PostModel from "./src/model/Post"
 
 // Import Query Type
 import AuthType from "./src/graphql/type/auth"
 import UserType from "./src/graphql/type/user"
+import ConversationType from "./src/graphql/type/conversation"
+import PostType from "./src/graphql/type/post"
 
 // The root provides a resolver function for each API endpoint
 const RootQueryType = new GraphQLObjectType({
@@ -46,6 +50,32 @@ const RootQueryType = new GraphQLObjectType({
         }
         return await UserModel.getUserDetail(args.id || req.userId)
       }
+    },
+    conversations: {
+      type: new GraphQLList(ConversationType),
+      description: "Conversations Between Users",
+      args: {
+        id: { type: GraphQLInt }
+      },
+      resolve: async (parent, args, req) => {
+        if (!req.userId) {
+          throw new Error("Access Denied")
+        }
+        return await ConversationModel.getConversations(req.userId, args.id)
+      }
+    },
+    posts: {
+      type: new GraphQLList(PostType),
+      description: "User Posts List",
+      args: {
+        id: { type: GraphQLInt }
+      },
+      resolve: async (parent, args, req) => {
+        if (!req.userId) {
+          throw new Error("Access Denied")
+        }
+        return await PostModel.getPosts(args.id)
+      }
     }
   })
 })
@@ -64,6 +94,34 @@ const RootMutationType = new GraphQLObjectType({
       },
       resolve: async (parent, { full_name, email, password }) => {
         return await UserModel.createUserByEmailPassword(full_name, email, password)
+      }
+    },
+    addConversation: {
+      type: GraphQLString,
+      description: "Add Conversation",
+      args: {
+        to_id: { type: GraphQLNonNull(GraphQLInt) },
+        message: { type: GraphQLNonNull(GraphQLString) }
+      },
+      resolve: async (parent, args, req) => {
+        if (!req.userId) {
+          throw new Error("Access Denied")
+        }
+        return await ConversationModel.addConversation(req.userId, args.to_id, args.message)
+      }
+    },
+    addPost: {
+      type: GraphQLString,
+      description: "Add Post",
+      args: {
+        to_id: { type: GraphQLNonNull(GraphQLInt) },
+        post: { type: GraphQLNonNull(GraphQLString) }
+      },
+      resolve: async (parent, args, req) => {
+        if (!req.userId) {
+          throw new Error("Access Denied")
+        }
+        return await PostModel.addPost(req.userId, args.to_id, args.post)
       }
     }
   })

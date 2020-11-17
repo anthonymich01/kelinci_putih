@@ -62,10 +62,10 @@ class Home extends React.Component {
 
     return (
       <>
-        <Layout user={me} users={sortedUsers}>
+        <Layout user={me} users={sortedUsers} socket={this.socket}>
           <h1>Members</h1>
           <div>
-            <Card.Group itemsPerRow={4}>
+            <Card.Group>
               {sortedUsers.map((user, key) => {
                 return (
                   <Card raised color={user.isOnline ? "green" : "grey"} key={key}>
@@ -83,8 +83,13 @@ class Home extends React.Component {
                       </Card.Meta>
                     </Card.Content>
                     <Card.Content extra>
-                      <Button icon="edit" color="blue" content="Post" onClick={() => Router.push(`/profile/${user.id}`)} />
-                      {me.id != user.id && <Button floated="right" icon="chat" color="blue" />}
+                      <Button
+                        icon="edit"
+                        color="blue"
+                        content="Post"
+                        onClick={() => Router.push(`/profile/${user.id}`)}
+                        floated="right"
+                      />
                     </Card.Content>
                   </Card>
                 )

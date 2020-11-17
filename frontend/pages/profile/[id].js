@@ -24,7 +24,7 @@ export default class Profile extends React.Component {
     }
   }
 
-  state = { onlineUsers: [] }
+  state = { onlineUsers: [], chatBox: false }
 
   socket = io(SOCKET_SERVER_URL)
 
@@ -47,13 +47,13 @@ export default class Profile extends React.Component {
 
   render() {
     const { user, id, me, users } = this.props
-    const { onlineUsers } = this.state
+    const { onlineUsers, chatBox } = this.state
     const firstName = user.full_name.split(" ")[0]
     const notMe = id && me.id != id
     const sortedUsers = sortedUsersList(users, onlineUsers)
 
     return (
-      <Layout user={me} users={sortedUsers}>
+      <Layout user={me} users={sortedUsers} socket={this.socket}>
         <h1>{firstName}'s Profile</h1>
 
         <Item.Group>
@@ -65,11 +65,6 @@ export default class Profile extends React.Component {
                 <Icon name="mail outline" id={style.profileEmailIcon} />
                 {user.email}
               </Item.Meta>
-              {notMe && (
-                <Item.Description id={style.profileDesc}>
-                  <Button icon="chat" content="Message" color="blue" />
-                </Item.Description>
-              )}
             </Item.Content>
           </Item>
         </Item.Group>

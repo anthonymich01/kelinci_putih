@@ -8,6 +8,7 @@ const io = require("socket.io")(server, {
 
 const PORT = process.env.SOC_PORT || 4000
 const NEW_CHAT_MESSAGE_EVENT = "newChatMessage"
+const GET_CHAT_MESSAGE_EVENT = "getChatMessage"
 const NEW_USER_LOGIN_EVENT = "newUserLogin"
 const USER_LEAVE_EVENT = "UserLeave"
 const ONLINE_USERS_EVENT = "onlineUsers"
@@ -28,17 +29,22 @@ io.on("connection", (socket) => {
     }
 
     onlineUsers.push(newUser)
-    console.log(onlineUsers)
 
     socket.emit(ONLINE_USERS_EVENT, { online_users: onlineUsers })
     socket.broadcast.emit(ONLINE_USERS_EVENT, { online_users: onlineUsers })
+
+    socket.on(NEW_CHAT_MESSAGE_EVENT, ({ from_id, to_id, message }) => {
+      const socketId = onlineUsers.find((u) => u.id === to_id)
+      if (socketId) {
+        io.to(socketId.token).emit(GET_CHAT_MESSAGE_EVENT, { from_id, message })
+      }
+    })
 
     socket.on("disconnect", () => {
       const idx = onlineUsers.findIndex((user) => user.token === socket.id)
       setTimeout(() => {
         onlineUsers.splice(idx, 1)
         socket.broadcast.emit(ONLINE_USERS_EVENT, { online_users: onlineUsers })
-        console.log(onlineUsers)
       }, 1000)
     })
   })

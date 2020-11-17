@@ -1,5 +1,8 @@
 import { ApolloClient, InMemoryCache } from "@apollo/client"
 import { gql } from "@apollo/client"
+import Cookie from "js-cookie"
+
+const access_token = Cookie.get("access_token")
 
 const client = (token = null) => {
   const headers = token
@@ -49,7 +52,8 @@ export const getLoggedInUser = async (token) => {
 }
 
 export const getUserDetailById = async (token, id) => {
-  return await client(token).query({
+  const myToken = token || access_token
+  return await client(myToken).query({
     query: gql`
       query { 
         user(id:${id}) {
@@ -59,6 +63,33 @@ export const getUserDetailById = async (token, id) => {
           avatar_url
         }
       }
+    `
+  })
+}
+
+export const getConversationsBetweenUsers = async (id) => {
+  return await client(access_token).query({
+    query: gql`
+      query {
+        conversations(id: ${id}) {
+          from_id
+          to_id
+          message
+          created_at
+        }
+      }
+      
+    `
+  })
+}
+
+export const addConversation = async (id, msg) => {
+  return await client(access_token).mutate({
+    mutation: gql`
+      mutation {
+        addConversation(to_id: ${id}, message: "${msg}")
+      }
+      
     `
   })
 }
