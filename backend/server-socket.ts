@@ -20,26 +20,26 @@ type onlineUser = {
 }
 
 io.on("connection", (socket) => {
-  // Listen for online users
+  // Listen for new user login
   socket.on(NEW_USER_LOGIN_EVENT, (data) => {
     const newUser: onlineUser = {
       id: data.userId,
       token: socket.id
     }
+
     onlineUsers.push(newUser)
     console.log(onlineUsers)
 
-    function sendOnlineUsers() {
-      socket.emit(ONLINE_USERS_EVENT, { online_users: onlineUsers })
-      setTimeout(sendOnlineUsers, 5000)
-    }
-    // Send online users every 5 sec
-    sendOnlineUsers()
+    socket.emit(ONLINE_USERS_EVENT, { online_users: onlineUsers })
+    socket.broadcast.emit(ONLINE_USERS_EVENT, { online_users: onlineUsers })
 
     socket.on("disconnect", () => {
       const idx = onlineUsers.findIndex((user) => user.token === socket.id)
-      onlineUsers.splice(idx, 1)
-      console.log(onlineUsers)
+      setTimeout(() => {
+        onlineUsers.splice(idx, 1)
+        socket.broadcast.emit(ONLINE_USERS_EVENT, { online_users: onlineUsers })
+        console.log(onlineUsers)
+      }, 1000)
     })
   })
 })

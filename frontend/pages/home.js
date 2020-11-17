@@ -1,43 +1,43 @@
 import React from "react"
-import socketIOClient from "socket.io-client"
 import nextCookie from "next-cookies"
 import Cookie from "js-cookie"
 import Router from "next/router"
 import _ from "lodash"
 import { getLoggedInUser } from "../src/api"
-import { NEW_USER_LOGIN_EVENT, ONLINE_USERS_EVENT, USER_LEAVE_EVENT } from "../src/constant"
-import { Card, Label, Image, Button } from "semantic-ui-react"
+import io from "socket.io-client"
+import { ONLINE_USERS_EVENT, userConnected, SOCKET_SERVER_URL } from "../src/utils/socket"
+import { sortedUsersList } from "../src/utils"
 import Layout from "../src/component/Layout"
 import LoginOrRegister from "../src/component/LoginOrRegister"
+import { Card, Label, Image, Button } from "semantic-ui-react"
 import style from "../src/style/home.module.scss"
-
-const SOCKET_SERVER_URL = "http://localhost:4000"
 
 class Home extends React.Component {
   static async getInitialProps(ctx) {
     const { access_token = null } = nextCookie(ctx)
+
     if (access_token) {
       const res = await getLoggedInUser(access_token)
-
       const usersList = res.data.users
       const me = res.data.user
-
       return { users: usersList, me }
     }
+
     return { users: {}, me: {} }
   }
 
   state = { onlineUsers: [] }
+  socket = io(SOCKET_SERVER_URL)
 
-  socket = socketIOClient(SOCKET_SERVER_URL)
-
-  componentDidMount = () => {
+  componentDidMount = async () => {
     const token = Cookie.get("access_token") || ""
     const { me } = this.props
     if (token) {
-      this.socket.emit(NEW_USER_LOGIN_EVENT, { userId: me.id, token: this.socket.id })
+      userConnected(this.socket, me.id)
+
       this.socket.on(ONLINE_USERS_EVENT, (data) => {
         this.setState({ onlineUsers: data.online_users })
+        console.log(data.online_users)
       })
     }
   }
@@ -58,16 +58,11 @@ class Home extends React.Component {
     }
 
     const { onlineUsers } = this.state
-    const joinUsers = users.map((user) => {
-      const isOnline = !!onlineUsers.find((ou) => ou.id === user.id)
-      return { ...user, isOnline: isOnline }
-    })
-    const sortedUsers = joinUsers.slice().sort((a, b) => b.isOnline - a.isOnline)
-    console.log(sortedUsers)
+    const sortedUsers = sortedUsersList(users, onlineUsers)
 
     return (
       <>
-        <Layout user={me}>
+        <Layout user={me} users={sortedUsers}>
           <h1>Members</h1>
           <div>
             <Card.Group itemsPerRow={4}>
@@ -88,7 +83,7 @@ class Home extends React.Component {
                       </Card.Meta>
                     </Card.Content>
                     <Card.Content extra>
-                      <Button icon="edit" color="blue" content="Post" />
+                      <Button icon="edit" color="blue" content="Post" onClick={() => Router.push(`/profile/${user.id}`)} />
                       {me.id != user.id && <Button floated="right" icon="chat" color="blue" />}
                     </Card.Content>
                   </Card>

@@ -31,6 +31,17 @@
       margin-bottom: 0;
     }
   }
+
+  .listMenu {
+    padding: 10px 20px !important;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.151);
+    }
+  }
 }
 
 .rightMenu {
@@ -41,4 +52,46 @@
   height: 100vh;
   padding: 20px 30px;
   overflow-y: auto;
+
+  .chatTrigger {
+    position: fixed;
+    bottom: 0;
+    right: 50px;
+    width: 250px;
+    text-align: center;
+    background-color: #f9f7f7;
+    color: #112d4e;
+    font-size: 16px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border: 1px solid #b9b9b9;
+    padding: 13px;
+    cursor: pointer;
+  }
+
+  .chatList {
+    position: fixed;
+    bottom: 0;
+    right: 50px;
+    width: 250px;
+    height: fit-content;
+    max-height: 400px;
+    background-color: #f9f7f7;
+    border: 1px solid #b9b9b9;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    color: #112d4e;
+
+    .chatTitle {
+      margin: 0;
+      padding: 13px 0;
+      font-size: 16px;
+      text-align: center;
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+      background-color: #112d4e;
+      color: #dbe2ef;
+      cursor: pointer;
+    }
+  }
 }
