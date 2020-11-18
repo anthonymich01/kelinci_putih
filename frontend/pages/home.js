@@ -2,7 +2,8 @@ import React from "react"
 import nextCookie from "next-cookies"
 import Cookie from "js-cookie"
 import Router from "next/router"
-import _ from "lodash"
+import Head from "next/head"
+import { isEmpty } from "lodash"
 import { getLoggedInUser } from "../src/api"
 import io from "socket.io-client"
 import { ONLINE_USERS_EVENT, userConnected, SOCKET_SERVER_URL } from "../src/utils/socket"
@@ -48,9 +49,12 @@ class Home extends React.Component {
   render() {
     const { users, me } = this.props
 
-    if (_.isEmpty(me)) {
+    if (isEmpty(me)) {
       return (
         <div id={style.root}>
+          <Head>
+            <title>Kelinci-Putih</title>
+          </Head>
           <LoginOrRegister />
         </div>
       )

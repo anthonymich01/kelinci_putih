@@ -2,7 +2,7 @@ require("dotenv").config()
 const server = require("http").createServer()
 const options = {
   cors: {
-    origin: ["http://localhost:3000", "https://anthonyyy.my.id", "https://www.anthonyyy.my.id"]
+    origin: process.env.WEB_CLIENT
   }
 }
 const io = require("socket.io")(server, options)

@@ -7,7 +7,10 @@
   "scripts": {
     "build": "tsc --project ./",
     "dev": "nodemon server.ts server-socket.ts",
-    "devSocket": "nodemon server-socket.ts"
+    "devSocket": "nodemon server-socket.ts",
+    "serverStart": "node build/server.js",
+    "socketStart": "node build/server-socket.js",
+    "start": "concurrently \"npm run serverStart\" \"npm run socketStart\""
   },
   "keywords": [],
   "license": "ISC",
@@ -35,6 +38,7 @@
     "@types/node": "^14.11.1",
     "@types/pg": "^7.14.5",
     "@types/uuid": "^8.3.0",
+    "concurrently": "^5.3.0",
     "nodemon": "^2.0.6",
     "ts-node": "^9.0.0",
     "typescript": "^4.0.3"
