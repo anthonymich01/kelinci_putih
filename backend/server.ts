@@ -152,6 +152,8 @@ const authTokenMiddleware = (req, res, next) => {
 app.use(cors())
 app.use(morgan("tiny"))
 app.use(authTokenMiddleware)
+
+// Running GraphQL on root
 app.use(
   graphqlHTTP({
     schema: schema,

@@ -7,8 +7,7 @@ export default new GraphQLObjectType({
     id: { type: GraphQLNonNull(GraphQLInt) },
     email: { type: GraphQLNonNull(GraphQLString) },
     full_name: { type: GraphQLNonNull(GraphQLString) },
-    avatar_url: { type: GraphQLString },
-    is_online: { type: GraphQLNonNull(GraphQLBoolean) },
+    avatar_url: { type: GraphQLString }, 
     created_at: { type: GraphQLNonNull(GraphQLString) },
     deleted_at: { type: GraphQLString }
   })

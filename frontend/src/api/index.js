@@ -19,11 +19,12 @@ const client = (token = null) => {
 }
 
 export const loginAttempt = async (email, password) => {
-  return await client(null).query({
+  return await client().query({
     query: gql`
       query {
         login(email: "${email}", password: "${password}") {
           access_token
+          message
         }
       }
     `
@@ -31,11 +32,12 @@ export const loginAttempt = async (email, password) => {
 }
 
 export const registerAttempt = async (full_name, email, password) => {
-  return await client(null).mutate({
+  return await client().mutate({
     mutation: gql`
       mutation {
         register(full_name: "${full_name}", email: "${email}", password: "${password}") {
           access_token
+          message
         }
       }
       

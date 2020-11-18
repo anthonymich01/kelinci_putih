@@ -14,13 +14,13 @@ import style from "../src/style/home.module.scss"
 
 class Home extends React.Component {
   static async getInitialProps(ctx) {
-    const { access_token = null } = nextCookie(ctx)
+    const { access_token } = nextCookie(ctx)
 
     if (access_token) {
       const res = await getLoggedInUser(access_token)
-      const usersList = res.data.users
+      const users = res.data.users
       const me = res.data.user
-      return { users: usersList, me }
+      return { users, me }
     }
 
     return { users: {}, me: {} }
@@ -30,9 +30,9 @@ class Home extends React.Component {
   socket = io(SOCKET_SERVER_URL)
 
   componentDidMount = async () => {
-    const token = Cookie.get("access_token") || ""
-    const { me } = this.props
+    const token = Cookie.get("access_token")
     if (token) {
+      const { me } = this.props
       userConnected(this.socket, me.id)
 
       this.socket.on(ONLINE_USERS_EVENT, (data) => {
@@ -61,7 +61,7 @@ class Home extends React.Component {
 
     return (
       <>
-        <Layout user={me} users={sortedUsers} socket={this.socket}>
+        <Layout headerTitle="Home" user={me} users={sortedUsers} socket={this.socket}>
           <h1>Members</h1>
           <div>
             <Card.Group>
@@ -69,12 +69,7 @@ class Home extends React.Component {
                 return (
                   <Card raised color={user.isOnline ? "green" : "grey"} key={key}>
                     <Card.Content style={{ cursor: "pointer" }} onClick={() => Router.push(`/profile/${user.id}`)}>
-                      <Image
-                        style={{ marginBottom: 0 }}
-                        floated="left"
-                        size="mini"
-                        src={user.avatar_url || "/avatar-default.png"}
-                      />
+                      <Image style={{ marginBottom: 0 }} floated="left" size="mini" src={user.avatar_url} />
                       <Card.Header>{user.full_name}</Card.Header>
                       <Card.Meta>
                         {user.isOnline ? "Online" : "Offline"}

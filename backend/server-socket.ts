@@ -1,24 +1,25 @@
 require("dotenv").config()
 const server = require("http").createServer()
-const io = require("socket.io")(server, {
+const options = {
   cors: {
-    origin: "http://localhost:3000"
+    origin: ["http://localhost:3000", "https://anthonyyy.my.id", "https://www.anthonyyy.my.id"]
   }
-})
+}
+const io = require("socket.io")(server, options)
 
-const PORT = process.env.SOC_PORT || 4000
-const NEW_CHAT_MESSAGE_EVENT = "newChatMessage"
-const GET_CHAT_MESSAGE_EVENT = "getChatMessage"
-const NEW_USER_LOGIN_EVENT = "newUserLogin"
-const USER_LEAVE_EVENT = "UserLeave"
-const ONLINE_USERS_EVENT = "onlineUsers"
-
-const onlineUsers: onlineUser[] = []
+const PORT: string = process.env.SOC_PORT || "4000"
+const NEW_CHAT_MESSAGE_EVENT: string = "newChatMessage"
+const GET_CHAT_MESSAGE_EVENT: string = "getChatMessage"
+const NEW_USER_LOGIN_EVENT: string = "newUserLogin"
+const USER_LEAVE_EVENT: string = "UserLeave"
+const ONLINE_USERS_EVENT: string = "onlineUsers"
 
 type onlineUser = {
   id: string
   token: string
 }
+
+const onlineUsers: onlineUser[] = []
 
 io.on("connection", (socket) => {
   // Listen for new user login

@@ -13,7 +13,7 @@ import style from "../../src/style/profile.module.scss"
 export default class Profile extends React.Component {
   static async getInitialProps(ctx) {
     const { id = null } = ctx.query
-    const { access_token = null } = nextCookie(ctx)
+    const { access_token } = nextCookie(ctx)
 
     try {
       const resProfile = await getUserDetailById(access_token, id)
@@ -32,13 +32,12 @@ export default class Profile extends React.Component {
   }
 
   state = { onlineUsers: [], postList: [], postMsg: "" }
-
   socket = io(SOCKET_SERVER_URL)
 
   componentDidMount = async () => {
-    const token = Cookie.get("access_token") || ""
-    const { me } = this.props
+    const token = Cookie.get("access_token")
     if (token) {
+      const { me } = this.props
       userConnected(this.socket, me.id)
 
       this.socket.on(ONLINE_USERS_EVENT, (data) => {
@@ -49,7 +48,6 @@ export default class Profile extends React.Component {
 
   componentWillUnmount = () => {
     this.socket.disconnect()
-    this.setState({ onlineUsers: [], postList: [], postMsg: "" })
   }
 
   handleSubmitPost = async () => {
@@ -60,8 +58,8 @@ export default class Profile extends React.Component {
     if (trimmedPost.length >= 1) {
       try {
         await addPost(user.id, trimmedPost)
-        Router.push(`/profile/${user.id}`)
         this.setState({ postMsg: "" })
+        Router.push(`/profile/${user.id}`)
       } catch (error) {
         console.log(error)
       }
@@ -76,12 +74,12 @@ export default class Profile extends React.Component {
     const sortedUsers = sortedUsersList(users, onlineUsers)
 
     return (
-      <Layout user={me} users={sortedUsers} socket={this.socket}>
+      <Layout headerTitle={`${user.full_name}'s Profile`} user={me} users={sortedUsers} socket={this.socket}>
         <h1>{firstName}'s Profile</h1>
 
         <Item.Group>
           <Item>
-            <Item.Image rounded size="small" src={user.avatar_url || "/avatar-default.png"} />
+            <Item.Image rounded size="small" src={user.avatar_url} />
             <Item.Content verticalAlign="middle">
               <Item.Header id={style.profileName}>{user.full_name}</Item.Header>
               <Item.Meta id={style.profileEmail}>
@@ -118,7 +116,7 @@ export default class Profile extends React.Component {
               {postList.map((p, k) => {
                 return (
                   <Feed.Event key={k} className={style.feedItem}>
-                    <Feed.Label image={p.created_by.avatar_url || "/avatar-default.png"} />
+                    <Feed.Label image={p.created_by.avatar_url} />
                     <Feed.Content>
                       <Feed.Date>{p.created_at}</Feed.Date>
                       <Feed.Summary>

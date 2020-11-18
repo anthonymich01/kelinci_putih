@@ -33,7 +33,7 @@ const getAllUserList = async (): Promise<any[]> => {
   }
 }
 
-const getUserDetail = async (id: number): Promise<object> => {
+const getUserDetail = async (id: number): Promise<{}> => {
   try {
     const res = await db.query(getUserDetailById, [id])
     return res.rows[0]
@@ -68,7 +68,7 @@ const loginUserByEmailPassword = async (email: string, password: string): Promis
 
 const createUserByEmailPassword = async (full_name: string, email: string, password: string): Promise<userAuth> => {
   const checkUserEmail: boolean = await isEmailDuplicated(email)
-  if (checkUserEmail) return { access_token: "", message: "Email already taken." }
+  if (checkUserEmail) return { access_token: "", message: "Email is already taken." }
 
   const trimmedFullName: string = full_name.trim()
   const trimmedEmail: string = email.trim()

@@ -1,6 +1,7 @@
 import React from "react"
 import Link from "next/link"
 import Router from "next/router"
+import Head from "next/head"
 import { addConversation, getConversationsBetweenUsers, getUserDetailById } from "../api"
 import { GET_CHAT_MESSAGE_EVENT, NEW_CHAT_MESSAGE_EVENT } from "../utils/socket"
 import { logout } from "../utils/auth"
@@ -10,8 +11,19 @@ import style from "./Layout.module.scss"
 
 class Layout extends React.Component {
   state = { chatListOpen: false, chatBoxOpen: false, conversations: [], toUser: {} }
-
   chatBoxContentRef = React.createRef()
+
+  componentDidMount = () => {
+    const soundNotif = new Audio("/stairs-567.ogg")
+    this.props.socket.on(GET_CHAT_MESSAGE_EVENT, async (data) => {
+      this.updateConversation(data.from_id)
+      try {
+        soundNotif.play()
+      } catch (error) {
+        console.log(error)
+      }
+    })
+  }
 
   handleChatListOpen = () => this.setState({ chatListOpen: !this.state.chatListOpen })
 
@@ -42,18 +54,6 @@ class Layout extends React.Component {
     }
   }
 
-  componentDidMount = () => {
-    const soundNotif = new Audio("/stairs-567.ogg")
-    this.props.socket.on(GET_CHAT_MESSAGE_EVENT, async (data) => {
-      this.updateConversation(data.from_id)
-      try {
-        soundNotif.play()
-      } catch (error) {
-        console.log(error)
-      }
-    })
-  }
-
   updateConversation = async (id) => {
     const resToUser = await getUserDetailById(null, id)
     const resConversations = await getConversationsBetweenUsers(id)
@@ -66,7 +66,7 @@ class Layout extends React.Component {
   }
 
   render() {
-    const { children, user, users } = this.props
+    const { children, user, users, headerTitle } = this.props
     const { chatListOpen, chatBoxOpen, toUser, conversations } = this.state
     const filteredUsers = users.slice()
     const idx = filteredUsers.findIndex((u) => u.id === user.id)
@@ -75,6 +75,9 @@ class Layout extends React.Component {
 
     return (
       <>
+        <Head>
+          <title>{headerTitle} | Kelinci-Putih</title>
+        </Head>
         <div className={style.leftMenu}>
           <Link href="/">
             <a>
@@ -83,7 +86,7 @@ class Layout extends React.Component {
           </Link>
 
           <div className={style.you}>
-            <Image circular id={style.avatar} src={user.avatar_url || "/avatar-default.png"} />
+            <Image id={style.avatar} src={user.avatar_url} circular />
             <h4>{user.full_name}</h4>
             <p>{user.email}</p>
           </div>
@@ -115,6 +118,7 @@ class Layout extends React.Component {
             </List.Item>
           </List>
         </div>
+
         <div className={style.rightMenu}>
           {children}
           {!chatListOpen && (
@@ -131,7 +135,7 @@ class Layout extends React.Component {
                 {filteredUsers.map((u, k) => {
                   return (
                     <List.Item key={k} onClick={() => this.handleChatBoxOpen(u.id)}>
-                      <Image avatar src={u.avatar_url || "/avatar-default.png"} />
+                      <Image avatar src={u.avatar_url} />
                       <List.Content>
                         <List.Header>
                           {u.full_name}

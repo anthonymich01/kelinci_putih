@@ -11,7 +11,7 @@ export const getPosts = async (id: number): Promise<any[]> => {
   }
 }
 
-export const addPost = async (from: number, to: number, post: string): Promise<{}> => {
+export const addPost = async (from: number, to: number, post: string): Promise<string> => {
   try {
     await db.query(addPostMessage, [from, to, post])
     return "Success"

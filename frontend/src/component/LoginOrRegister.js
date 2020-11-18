@@ -1,9 +1,9 @@
 import React from "react"
 import { loginAttempt, registerAttempt } from "../api"
 import { login } from "../utils/auth"
+import { capitalizeFirstLetter } from "../utils"
 import { Button, Divider, Form, Grid, Icon, Segment, Input, Message } from "semantic-ui-react"
 import style from "./LoginOrRegister.module.scss"
-import { capitalizeFirstLetter } from "../utils"
 
 export default class Login extends React.Component {
   state = {
@@ -16,21 +16,25 @@ export default class Login extends React.Component {
     regisError: ""
   }
 
-  handleChange = (e, { name, value }) => this.setState({ [name]: value })
+  handleOnChange = (e, { name, value }) => this.setState({ [name]: value })
 
   handleLoginSubmit = async () => {
     const { loginEmail, loginPassword } = this.state
-    if (loginPassword.length < 6) {
+    const email = loginEmail.trim()
+    const password = loginPassword.trim()
+
+    if (password.length < 6) {
       this.setState({ loginError: "Minimum password length is 6 digit." })
       return
     }
+
     try {
-      const res = await loginAttempt(loginEmail, loginPassword)
-      if (res.data.login.access_token) {
-        const token = res.data.login.access_token
-        login(token)
+      const res = await loginAttempt(email, password)
+      const { access_token, message } = res.data.login
+      if (access_token) {
+        login(access_token)
       } else {
-        this.setState({ loginError: "Email / Password is incorrect." })
+        this.setState({ loginError: message })
       }
     } catch (error) {
       console.log(error)
@@ -39,22 +43,22 @@ export default class Login extends React.Component {
 
   handleRegisterSubmit = async () => {
     const { regisName, regisEmail, regisPassword } = this.state
+    const name = capitalizeFirstLetter(regisName.trim())
+    const email = regisEmail.trim()
+    const password = regisPassword.trim()
+
     if (regisPassword.length < 6) {
       this.setState({ regisError: "Minimum password length is 6 digit." })
       return
     }
 
-    const name = capitalizeFirstLetter(regisName.trim())
-    const email = regisEmail.trim()
-    const password = regisPassword.trim()
-
     try {
       const res = await registerAttempt(name, email, password)
-      if (res.data.register.access_token) {
-        const token = res.data.register.access_token
-        login(token)
+      const { access_token, message } = res.data.register
+      if (access_token) {
+        login(access_token)
       } else {
-        this.setState({ regisError: "Email already taken." })
+        this.setState({ regisError: message })
       }
     } catch (error) {
       console.log(error)
@@ -84,7 +88,7 @@ export default class Login extends React.Component {
                         name="loginEmail"
                         type="email"
                         placeholder="tony@stark.com"
-                        onChange={this.handleChange}
+                        onChange={this.handleOnChange}
                         value={loginEmail}
                       />
                     </Form.Field>
@@ -95,7 +99,7 @@ export default class Login extends React.Component {
                         type="password"
                         placeholder="********"
                         icon="key"
-                        onChange={this.handleChange}
+                        onChange={this.handleOnChange}
                         value={loginPassword}
                         autoComplete="on"
                         required
@@ -105,7 +109,7 @@ export default class Login extends React.Component {
                   </Form>
                   {loginError && (
                     <Message negative>
-                      <p>{loginError}</p>
+                      <p className={style.errorText}>{loginError}</p>
                     </Message>
                   )}
                 </Segment>
@@ -123,7 +127,7 @@ export default class Login extends React.Component {
                           name="regisName"
                           type="text"
                           placeholder="Tony Stark"
-                          onChange={this.handleChange}
+                          onChange={this.handleOnChange}
                           value={regisName}
                           required
                         />
@@ -134,7 +138,7 @@ export default class Login extends React.Component {
                           name="regisEmail"
                           type="email"
                           placeholder="tony@stark.com"
-                          onChange={this.handleChange}
+                          onChange={this.handleOnChange}
                           value={regisEmail}
                         />
                       </Form.Field>
@@ -146,7 +150,7 @@ export default class Login extends React.Component {
                         type="password"
                         placeholder="********"
                         icon="key"
-                        onChange={this.handleChange}
+                        onChange={this.handleOnChange}
                         value={regisPassword}
                         required
                       />
@@ -155,7 +159,7 @@ export default class Login extends React.Component {
                   </Form>
                   {regisError && (
                     <Message negative>
-                      <p>{regisError}</p>
+                      <p className={style.errorText}>{regisError}</p>
                     </Message>
                   )}
                 </Segment>

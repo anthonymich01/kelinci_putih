@@ -78,7 +78,7 @@ export default class ChatBox extends React.Component {
                         <Image
                           avatar
                           className={style.chatBoxAva}
-                          src={toUser.avatar_url || "/avatar-default.png"}
+                          src={toUser.avatar_url}
                           onClick={() => Router.push(`/profile/${toUser.id}`)}
                         />
                       }
