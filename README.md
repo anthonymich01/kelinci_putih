@@ -42,6 +42,6 @@ or. . . You can register a new account yourself
 * Sass
 
 ### Misc
-* Auth using **JsonWebToken**
+* Auth using **JSON Web Token**
 * Server: **Google Cloud Platform**
 * Hosted in: **Jakarta, Indonesia**
