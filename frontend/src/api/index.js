@@ -12,7 +12,7 @@ const client = (token = null) => {
     : {}
 
   return new ApolloClient({
-    uri: "http://localhost:3010/",
+    uri: process.env.NEXT_PUBLIC_BACKEND,
     cache: new InMemoryCache(),
     headers
   })

@@ -1,4 +1,4 @@
-export const SOCKET_SERVER_URL = "http://localhost:4000"
+export const SOCKET_SERVER_URL = process.env.NEXT_PUBLIC_SOCKET
 
 // Socket.io Event
 export const NEW_CHAT_MESSAGE_EVENT = "newChatMessage"
